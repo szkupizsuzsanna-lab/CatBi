@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CatBi - Hivatalos Játék Oldal</title>
+    <style>
+        :root {
+            --bg-color: #0f111a;
+            --card-bg: #1a1d29;
+            --accent: #ff6b35;
+            --accent-hover: #ff8c5a;
+            --text: #ffffff;
+            --text-muted: #a0a6b8;
+            --border: #2a2e3d;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1a1d29 0%, #11131b 100%);
+            border-bottom: 2px solid var(--accent);
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .user-panel {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        button, .btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        button:hover, .btn:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent);
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        section {
+            margin-bottom: 3rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        /* Lenyitható Entity kártyák (Accordion) */
+        .entity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            border-color: var(--accent);
+        }
+
+        .card-header {
+            padding: 1rem;
+            background-color: rgba(255,255,255,0.02);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .card-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            padding: 0 1rem;
+        }
+
+        .card.active .card-content {
+            max-height: 500px;
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .card img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 0.8rem;
+        }
+
+        /* Waves, Roles & Abilities layout */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .info-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .info-box h3 {
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Shop Grid */
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .shop-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .shop-item .price {
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin: 1rem 0;
+        }
+
+        /* Admin Panel */
+        #admin-panel {
+            background: #221410;
+            border: 2px dashed var(--accent);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            display: none;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.8rem;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--card-bg);
+            color: var(--accent);
+        }
+
+        /* Modal ablakok */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid var(--border);
+        }
+
+        .modal-content h3 {
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            color: var(--text-muted);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.6rem;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            background: var(--bg-color);
+            color: var(--text);
+        }
+
+        .autosave-status {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-left: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">🐱 CatBi Játék</div>
+        <div class="user-panel">
+            <span id="user-display" style="display:none;">Üdv, <strong id="username-span"></strong>! <span class="autosave-status">💾 Auto-saved</span></span>
+            <button id="login-btn" onclick="openModal('auth-modal')">Bejelentkezés / Regisztráció</button>
+            <button id="logout-btn" onclick="logout()" style="display:none;" class="btn-secondary">Kijelentkezés</button>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- OWNER / ADMIN PANEL (Csak ownernek látszik) -->
+        <div id="admin-panel">
+            <h2>👑 Owner Vezérlőpult (Admin)</h2>
+            <p>Itt látod a regisztrált játékosokat és a rendszer állapotát:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Felhasználónév</th>
+                        <th>Regisztráció ideje</th>
+                        <th>Státusz</th>
+                    </tr>
+                </thead>
+                <tbody id="player-table-body">
+                    <!-- Ide töltődnek be a játékosok -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ENTITIES SZEKCIÓ (Lenyitható kártyák) -->
+        <section>
+            <h2>🐾 Entity-k & Karakterek</h2>
+            <div class="entity-grid">
+                <div class="card" onclick="toggleCard(this)">
+                    <div class="card-header"><span>CatBi Vezér</span> <span>▼</span></div>
+                    <div class="card-content">
+                        <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400&auto=format&fit=crop&q=80" alt="CatBi Vezér">
+                        <p>A főharcos macska, aki különleges energiákkal bír. Képes egyszerre több ellenséget leszerelni a karmaival.</p>
+                    </div>
+                </div>
+                <div class="card" onclick="toggleCard(this)">
+                    <div class="card-header"><span>Shadow Claw (Árnyék Karom)</span> <span>▼</span></div>
+                    <div class="card-content">
+                        <img src="https://images.unsplash.com/photo-1573865526739-10659fec78a5?w=400&auto=format&fit=crop&q=80" alt="Shadow Claw">
+                        <p>Rejtőzködő ellenfél, aki a sötét hullámokban támad hátulról. Magas a sebzése, de kevés az élete.</p>
+                    </div>
+                </div>
+                <div class="card" onclick="toggleCard(this)">
+                    <div class="card-header"><span>Cyber Meow Boss</span> <span>▼</span></div>
+                    <div class="card-content">
+                        <img src="https://images.unsplash.com/photo-1543852786-1cf6624b9987?w=400&auto=format&fit=crop&q=80" alt="Cyber Meow Boss">
+                        <p>A végső mechanikus főszerezettség, nehéz pajzsokkal és lézerfegyverekkel felszerelve.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- WAVES SZEKCIÓ -->
+        <section>
+            <h2>🌊 Wave (Hullám) Leírások</h2>
+            <div class="info-grid">
+                <div class="info-box">
+                    <h3>1-5. Hullám (Kezdő)</h3>
+                    <p>Alapvető ellenfelek érkeznek. Kiváló terep a tapasztalatszerzésre és a pénzgyűjtésre.</p>
+                </div>
+                <div class="info-box">
+                    <h3>6-10. Hullám (Közép)</h3>
+                    <p>Megjelennek az árnyék lények és a gyorsabb egységek. Stratégiai védekezés szükséges.</p>
+                </div>
+                <div class="info-box">
+                    <h3>11+. Hullám (Boss Zóna)</h3>
+                    <p>A Cyber Boss és hordái támadnak. Csak a legjobban fejlesztett képességekkel győzhető le.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ROLES & ABILITIES SZEKCIÓ -->
+        <section>
+            <h2>⚡ Role-ok & Képességek (Abilities)</h2>
+            <div class="info-grid">
+                <div class="info-box">
+                    <h3>Berserker Cat (Role)</h3>
+                    <p><b>Képesség:</b> Karmos Fúria – 5 másodpercig duplázza a támadási sebességet.</p>
+                </div>
+                <div class="info-box">
+                    <h3>Guardian Cat (Role)</h3>
+                    <p><b>Képesség:</b> Pajzs Fal – Elnyeli az ellenséges lövések 80%-át egy rövid ideig.</p>
+                </div>
+                <div class="info-box">
+                    <h3>Sniper Cat (Role)</h3>
+                    <p><b>Képesség:</b> Lézersugár – Nagy hatótávolságú, kritikus sebzésű lövés egy célpontra.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SHOP SZEKCIÓ -->
+        <section>
+            <h2>🛒 CatBi Bolt (Shop)</h2>
+            <div class="shop-grid">
+                <div class="shop-item">
+                    <h3>Arany Hal Csomag</h3>
+                    <p>1000 Játékon belüli érme a fejlesztésekhez.</p>
+                    <div class="price">500 CatCoin</div>
+                    <button onclick="buyItem('Arany Hal Csomag')">Vásárlás</button>
+                </div>
+                <div class="shop-item">
+                    <h3>Cyber Skin</h3>
+                    <p>Exkluzív futurisztikus külső a karakterednek.</p>
+                    <div class="price">1200 CatCoin</div>
+                    <button onclick="buyItem('Cyber Skin')">Vásárlás</button>
+                </div>
+                <div class="shop-item">
+                    <h3>Dupla XP Bónusz</h3>
+                    <p>24 órás gyorsított szintlépés.</p>
+                    <div class="price">800 CatCoin</div>
+                    <button onclick="buyItem('Dupla XP Bónusz')">Vásárlás</button>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- BEJELENTKEZŐ / REGISZTRÁCIÓS MODAL -->
+    <div id="auth-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="modal-title">Fiók Bejelentkezés</h3>
+            <div class="form-group">
+                <label>Felhasználónév</label>
+                <input type="text" id="auth-username" placeholder="pl. jatekos01">
+            </div>
+            <div class="form-group">
+                <label>Jelszó</label>
+                <input type="password" id="auth-password" placeholder="********">
+            </div>
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <button onclick="handleAuth()" style="flex:1;">Belépés / Regisztráció</button>
+                <button onclick="closeModal('auth-modal')" class="btn-secondary">Mégse</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Lenyitható kártyák kezelése
+        function toggleCard(card) {
+            card.classList.toggle('active');
+        }
+
+        // Modal ablakok kezelése
+        function openModal(id) {
+            document.getElementById(id).style.display = 'flex';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        // Fiókrendszer és Auto-Save logika (localStorage alapú)
+        let currentUser = localStorage.getItem('catbi_current_user');
+
+        function initApp() {
+            if (currentUser) {
+                document.getElementById('user-display').style.display = 'inline-block';
+                document.getElementById('username-span').innerText = currentUser;
+                document.getElementById('login-btn').style.display = 'none';
+                document.getElementById('logout-btn').style.display = 'inline-block';
+
+                // Ha az owner vagy, mutassuk az admin panelt
+                if (currentUser.toLowerCase() === 'owner') {
+                    document.getElementById('admin-panel').style.display = 'block';
+                    loadAdminPlayers();
+                }
+            }
+        }
+
+        function handleAuth() {
+            const username = document.getElementById('auth-username').value.trim();
+            if (!username) {
+                alert('Add meg a felhasználóneved!');
+                return;
+            }
+
+            // Felhasználók mentése a localStorage-ba (Auto-save adatbázis szimuláció)
+            let players = JSON.parse(localStorage.getItem('catbi_players') || '[]');
+            let existing = players.find(p => p.username === username);
+
+            if (!existing) {
+                players.push({ username: username, date: new Date().toLocaleDateString('hu-HU') });
+                localStorage.setItem('catbi_players', JSON.stringify(players));
+            }
+
+            localStorage.setItem('catbi_current_user', username);
+            currentUser = username;
+            closeModal('auth-modal');
+            initApp();
+            alert('Sikeres bejelentkezés! A rendszer automatikusan menti a munkádat.');
+        }
+
+        function logout() {
+            localStorage.removeItem('catbi_current_user');
+            location.reload();
+        }
+
+        function loadAdminPlayers() {
+            let players = JSON.parse(localStorage.getItem('catbi_players') || '[]');
+            let tbody = document.getElementById('player-table-body');
+            tbody.innerHTML = '';
+            players.forEach(p => {
+                tbody.innerHTML += `<tr><td>${p.username}</td><td>${p.date}</td><td>Aktív</td></tr>`;
+            });
+        }
+
+        function buyItem(itemName) {
+            if (!currentUser) {
+                alert('Kérlek jelentkezz be a vásárláshoz!');
+                openModal('auth-modal');
+                return;
+            }
+            alert(`Sikeres vásárlás: ${itemName}! Köszönjük, ${currentUser}.`);
+        }
+
+        // Oldal betöltésekor indítás
+        window.onload = initApp;
+    </script>
+</body>
+</html>
