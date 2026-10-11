@@ -3,391 +3,508 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CatBi - Hivatalos Játék Oldal</title>
+    <title>CatBi - Hivatalos Játék Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0f111a;
-            --card-bg: #1a1d29;
-            --accent: #ff6b35;
-            --accent-hover: #ff8c5a;
-            --text: #ffffff;
-            --text-muted: #a0a6b8;
-            --border: #2a2e3d;
+            --bg: #090a0f;
+            --surface: #131622;
+            --surface-hover: #1c2135;
+            --primary: #f97316;
+            --primary-hover: #ea580c;
+            --accent: #06b6d4;
+            --text: #f3f4f6;
+            --text-dim: #9ca3af;
+            --border: #1f293d;
+            --radius: 12px;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Outfit', sans-serif;
         }
 
         body {
-            background-color: var(--bg-color);
+            background-color: var(--bg);
             color: var(--text);
-            line-height: 1.6;
+            min-height: 100vh;
         }
 
+        /* Navigációs sáv */
         header {
-            background: linear-gradient(135deg, #1a1d29 0%, #11131b 100%);
-            border-bottom: 2px solid var(--accent);
-            padding: 1.5rem 2rem;
+            background: rgba(19, 22, 34, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 1000;
         }
 
         .logo {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: var(--accent);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .user-panel {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 1px;
             display: flex;
-            gap: 1rem;
             align-items: center;
+            gap: 8px;
         }
 
+        .user-hud {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .balance-badge {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-family: 'Space Mono', monospace;
+            color: #fbbf24;
+            font-weight: 700;
+            display: none;
+        }
+
+        .user-info {
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.95rem;
+        }
+
+        /* Gombok és elemek */
         button, .btn {
-            background-color: var(--accent);
+            background-color: var(--primary);
             color: white;
             border: none;
             padding: 0.6rem 1.2rem;
-            border-radius: 6px;
+            border-radius: var(--radius);
             cursor: pointer;
-            font-weight: bold;
-            transition: background 0.2s;
-            text-decoration: none;
-            display: inline-block;
+            font-weight: 600;
+            transition: all 0.2s ease;
         }
 
-        button:hover, .btn:hover {
-            background-color: var(--accent-hover);
+        button:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
         }
 
-        .btn-secondary {
-            background-color: transparent;
+        .btn-outline {
+            background: transparent;
             border: 1px solid var(--border);
-            color: var(--text-muted);
+            color: var(--text-dim);
         }
 
-        .btn-secondary:hover {
-            border-color: var(--accent);
+        .btn-outline:hover {
+            border-color: var(--primary);
             color: var(--text);
+            background: transparent;
         }
 
+        /* Layout konténer */
         .container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem;
         }
 
         section {
-            margin-bottom: 3rem;
+            margin-bottom: 3.5rem;
         }
 
         h2 {
-            font-size: 2rem;
+            font-size: 1.75rem;
+            font-weight: 800;
             margin-bottom: 1.5rem;
-            color: var(--accent);
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 0.5rem;
-        }
-
-        /* Lenyitható Entity kártyák (Accordion) */
-        .entity-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            overflow: hidden;
-            transition: transform 0.2s;
-        }
-
-        .card:hover {
-            border-color: var(--accent);
-        }
-
-        .card-header {
-            padding: 1rem;
-            background-color: rgba(255,255,255,0.02);
-            cursor: pointer;
+            letter-spacing: -0.5px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            font-weight: bold;
-            font-size: 1.2rem;
+            gap: 10px;
         }
 
-        .card-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-            padding: 0 1rem;
-        }
-
-        .card.active .card-content {
-            max-height: 500px;
-            padding: 1rem;
-            border-top: 1px solid var(--border);
-        }
-
-        .card img {
-            width: 100%;
-            height: 160px;
-            object-fit: cover;
-            border-radius: 4px;
-            margin-bottom: 0.8rem;
-        }
-
-        /* Waves, Roles & Abilities layout */
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-        }
-
-        .info-box {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            padding: 1.5rem;
-            border-radius: 8px;
-        }
-
-        .info-box h3 {
-            color: var(--accent);
-            margin-bottom: 0.5rem;
-        }
-
-        /* Shop Grid */
-        .shop-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .shop-item {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1.5rem;
-            text-align: center;
-        }
-
-        .shop-item .price {
-            color: var(--accent);
-            font-weight: bold;
-            font-size: 1.2rem;
-            margin: 1rem 0;
+        h2::before {
+            content: '';
+            width: 6px;
+            height: 24px;
+            background: var(--primary);
+            border-radius: 3px;
+            display: inline-block;
         }
 
         /* Admin Panel */
         #admin-panel {
-            background: #221410;
-            border: 2px dashed var(--accent);
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
+            background: linear-gradient(135deg, #181211 0%, #131622 100%);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin-bottom: 3rem;
             display: none;
         }
 
-        table {
+        .admin-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 1rem;
-        }
-
-        th, td {
+            margin-top: 1.2rem;
+            background: var(--surface);
+            border-radius: var(--radius);
+            overflow: hidden;
             border: 1px solid var(--border);
-            padding: 0.8rem;
+        }
+
+        .admin-table th, .admin-table td {
+            padding: 1rem;
             text-align: left;
+            border-bottom: 1px solid var(--border);
         }
 
-        th {
-            background-color: var(--card-bg);
+        .admin-table th {
+            background: rgba(0,0,0,0.2);
+            color: var(--primary);
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+        }
+
+        .admin-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .money-input {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: white;
+            padding: 0.4rem 0.6rem;
+            border-radius: 6px;
+            width: 100px;
+            font-family: 'Space Mono', monospace;
+        }
+
+        /* Entity Kártyák (Lenyitható) */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .entity-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .entity-card:hover {
+            border-color: rgba(249, 115, 22, 0.5);
+        }
+
+        .entity-header {
+            padding: 1.2rem 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .entity-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(0,0,0,0.15);
+            padding: 0 1.5rem;
+        }
+
+        .entity-card.open .entity-body {
+            max-height: 600px;
+            padding: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .entity-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .entity-desc {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* Wave & Info Boxok */
+        .info-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+        }
+
+        .info-card h3 {
             color: var(--accent);
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
         }
 
-        /* Modal ablakok */
+        .info-card p {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+        }
+
+        /* Bolt / Shop (Abilitykkel és cuccokkal) */
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .shop-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .shop-card h3 {
+            margin-bottom: 0.4rem;
+        }
+
+        .shop-card .tag {
+            font-size: 0.75rem;
+            font-family: 'Space Mono', monospace;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.8rem;
+            display: inline-block;
+        }
+
+        .shop-card p {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .shop-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price-tag {
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+            color: #fbbf24;
+            font-size: 1.1rem;
+        }
+
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
+            background: rgba(9, 10, 15, 0.85);
+            backdrop-blur: 5px;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
+            z-index: 2000;
         }
 
-        .modal-content {
-            background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 8px;
-            width: 100%;
-            max-width: 400px;
+        .modal-box {
+            background: var(--surface);
             border: 1px solid var(--border);
+            padding: 2.5rem;
+            border-radius: var(--radius);
+            width: 100%;
+            max-width: 420px;
         }
 
-        .modal-content h3 {
-            margin-bottom: 1rem;
-            color: var(--accent);
+        .modal-box h3 {
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
         }
 
-        .form-group {
-            margin-bottom: 1rem;
+        .input-group {
+            margin-bottom: 1.2rem;
         }
 
-        .form-group label {
+        .input-group label {
             display: block;
-            margin-bottom: 0.3rem;
-            color: var(--text-muted);
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 0.6rem;
-            border-radius: 4px;
-            border: 1px solid var(--border);
-            background: var(--bg-color);
-            color: var(--text);
-        }
-
-        .autosave-status {
             font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-left: 1rem;
+            color: var(--text-dim);
+            margin-bottom: 0.4rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .arrow-icon {
+            transition: transform 0.2s;
+        }
+        .entity-card.open .arrow-icon {
+            transform: rotate(180deg);
         }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo">🐱 CatBi Játék</div>
-        <div class="user-panel">
-            <span id="user-display" style="display:none;">Üdv, <strong id="username-span"></strong>! <span class="autosave-status">💾 Auto-saved</span></span>
-            <button id="login-btn" onclick="openModal('auth-modal')">Bejelentkezés / Regisztráció</button>
-            <button id="logout-btn" onclick="logout()" style="display:none;" class="btn-secondary">Kijelentkezés</button>
+        <div class="logo">🐱 CATBI // HUB</div>
+        <div class="user-hud">
+            <div id="balance-badge" class="balance-badge">💰 <span id="user-coins">0</span> CC</div>
+            <div id="user-info" class="user-info">
+                <span>Fiók: <strong id="username-display" style="color:var(--primary);"></strong></span>
+                <button onclick="logout()" class="btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">Kilépés</button>
+            </div>
+            <button id="login-trigger-btn" onclick="openAuthModal()">Bejelentkezés</button>
         </div>
     </header>
 
     <div class="container">
 
-        <!-- OWNER / ADMIN PANEL (Csak ownernek látszik) -->
+        <!-- OWNER / ADMIN PANEL -->
         <div id="admin-panel">
-            <h2>👑 Owner Vezérlőpult (Admin)</h2>
-            <p>Itt látod a regisztrált játékosokat és a rendszer állapotát:</p>
-            <table>
+            <h2>👑 Owner Vezérlőpult (Játékosok & Pénz Kezelés)</h2>
+            <p style="color: var(--text-dim); font-size: 0.95rem;">Itt látod a regisztrált játékosokat, és valós időben módosíthatod az egyenlegüket (Auto-save mentődik).</p>
+            <table class="admin-table">
                 <thead>
                     <tr>
                         <th>Felhasználónév</th>
                         <th>Regisztráció ideje</th>
-                        <th>Státusz</th>
+                        <th>Egyenleg (CatCoin)</th>
+                        <th>Művelet</th>
                     </tr>
                 </thead>
-                <tbody id="player-table-body">
-                    <!-- Ide töltődnek be a játékosok -->
+                <tbody id="admin-players-tbody">
+                    <!-- Dinamikusan töltődik -->
                 </tbody>
             </table>
         </div>
 
-        <!-- ENTITIES SZEKCIÓ (Lenyitható kártyák) -->
+        <!-- ENTITYK SZEKCIÓ -->
         <section>
-            <h2>🐾 Entity-k & Karakterek</h2>
-            <div class="entity-grid">
-                <div class="card" onclick="toggleCard(this)">
-                    <div class="card-header"><span>CatBi Vezér</span> <span>▼</span></div>
-                    <div class="card-content">
-                        <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400&auto=format&fit=crop&q=80" alt="CatBi Vezér">
-                        <p>A főharcos macska, aki különleges energiákkal bír. Képes egyszerre több ellenséget leszerelni a karmaival.</p>
+            <h2>Entity-k & Lények</h2>
+            <div class="grid">
+                <div class="entity-card" onclick="toggleEntity(this)">
+                    <div class="entity-header">
+                        <span>CatBi Vezér</span>
+                        <span class="arrow-icon">▼</span>
+                    </div>
+                    <div class="entity-body">
+                        <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=500&auto=format&fit=crop&q=80" class="entity-img" alt="CatBi Vezér">
+                        <p class="entity-desc">A frakció főparancsnoka. Különleges reflexekkel és magas HP-val rendelkezik, miközben folyamatosan osztja a kritikus sebzéseket a közelharcban.</p>
                     </div>
                 </div>
-                <div class="card" onclick="toggleCard(this)">
-                    <div class="card-header"><span>Shadow Claw (Árnyék Karom)</span> <span>▼</span></div>
-                    <div class="card-content">
-                        <img src="https://images.unsplash.com/photo-1573865526739-10659fec78a5?w=400&auto=format&fit=crop&q=80" alt="Shadow Claw">
-                        <p>Rejtőzködő ellenfél, aki a sötét hullámokban támad hátulról. Magas a sebzése, de kevés az élete.</p>
+                <div class="entity-card" onclick="toggleEntity(this)">
+                    <div class="entity-header">
+                        <span>Shadow Claw</span>
+                        <span class="arrow-icon">▼</span>
+                    </div>
+                    <div class="entity-body">
+                        <img src="https://images.unsplash.com/photo-1573865526739-10659fec78a5?w=500&auto=format&fit=crop&q=80" class="entity-img" alt="Shadow Claw">
+                        <p class="entity-desc">Rejtőzködő egység, amely a sötét hullámok alatt lopakodik elő. Rendkívül gyors mozgású, de sebezhetőbb a távolsági támadásokkal szemben.</p>
                     </div>
                 </div>
-                <div class="card" onclick="toggleCard(this)">
-                    <div class="card-header"><span>Cyber Meow Boss</span> <span>▼</span></div>
-                    <div class="card-content">
-                        <img src="https://images.unsplash.com/photo-1543852786-1cf6624b9987?w=400&auto=format&fit=crop&q=80" alt="Cyber Meow Boss">
-                        <p>A végső mechanikus főszerezettség, nehéz pajzsokkal és lézerfegyverekkel felszerelve.</p>
+                <div class="entity-card" onclick="toggleEntity(this)">
+                    <div class="entity-header">
+                        <span>Cyber Meow Boss</span>
+                        <span class="arrow-icon">▼</span>
+                    </div>
+                    <div class="entity-body">
+                        <img src="https://images.unsplash.com/photo-1543852786-1cf6624b9987?w=500&auto=format&fit=crop&q=80" class="entity-img" alt="Cyber Meow Boss">
+                        <p class="entity-desc">Futurisztikus főellenfél energipajzzsal. Nehezen áttörhető páncélzata miatt komoly csapatmunka és speciális abilityk szükségesek a legyőzéséhez.</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- WAVES SZEKCIÓ -->
+        <!-- WAVE LEÍRÁSOK -->
         <section>
-            <h2>🌊 Wave (Hullám) Leírások</h2>
-            <div class="info-grid">
-                <div class="info-box">
-                    <h3>1-5. Hullám (Kezdő)</h3>
-                    <p>Alapvető ellenfelek érkeznek. Kiváló terep a tapasztalatszerzésre és a pénzgyűjtésre.</p>
+            <h2>Wave (Hullám) Kihívások</h2>
+            <div class="grid">
+                <div class="info-card">
+                    <h3>1 - 5. Hullám: Bevezetés</h3>
+                    <p>Alapvető ellenfelek hulláma. Ideális a farmolásra, alapvető felszerelések megszerzésére és a játékmechanika kitapasztalására.</p>
                 </div>
-                <div class="info-box">
-                    <h3>6-10. Hullám (Közép)</h3>
-                    <p>Megjelennek az árnyék lények és a gyorsabb egységek. Stratégiai védekezés szükséges.</p>
+                <div class="info-card">
+                    <h3>6 - 10. Hullám: Taktikai Zóna</h3>
+                    <p>Megjelennek az árnyék lények. Itt már kulcsfontosságú a megfelelő pozicionálás és a védekezési stratégia összeállítása.</p>
                 </div>
-                <div class="info-box">
-                    <h3>11+. Hullám (Boss Zóna)</h3>
-                    <p>A Cyber Boss és hordái támadnak. Csak a legjobban fejlesztett képességekkel győzhető le.</p>
+                <div class="info-card">
+                    <h3>11+ Hullám: Boss Aréna</h3>
+                    <p>A nehézségi szint maximumra kapcsol. A Cyber Boss támadásai elől csak pontos időzítéssel lehet kitérni.</p>
                 </div>
             </div>
         </section>
 
-        <!-- ROLES & ABILITIES SZEKCIÓ -->
+        <!-- SHOP & ABILITYK SZEKCIÓ -->
         <section>
-            <h2>⚡ Role-ok & Képességek (Abilities)</h2>
-            <div class="info-grid">
-                <div class="info-box">
-                    <h3>Berserker Cat (Role)</h3>
-                    <p><b>Képesség:</b> Karmos Fúria – 5 másodpercig duplázza a támadási sebességet.</p>
-                </div>
-                <div class="info-box">
-                    <h3>Guardian Cat (Role)</h3>
-                    <p><b>Képesség:</b> Pajzs Fal – Elnyeli az ellenséges lövések 80%-át egy rövid ideig.</p>
-                </div>
-                <div class="info-box">
-                    <h3>Sniper Cat (Role)</h3>
-                    <p><b>Képesség:</b> Lézersugár – Nagy hatótávolságú, kritikus sebzésű lövés egy célpontra.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- SHOP SZEKCIÓ -->
-        <section>
-            <h2>🛒 CatBi Bolt (Shop)</h2>
+            <h2>Bolt & Abilityk</h2>
             <div class="shop-grid">
-                <div class="shop-item">
-                    <h3>Arany Hal Csomag</h3>
-                    <p>1000 Játékon belüli érme a fejlesztésekhez.</p>
-                    <div class="price">500 CatCoin</div>
-                    <button onclick="buyItem('Arany Hal Csomag')">Vásárlás</button>
+                <div class="shop-card">
+                    <div>
+                        <span class="tag">Ability // Aktív Képesség</span>
+                        <h3>Karmos Fúria (Berserker)</h3>
+                        <p>5 másodpercre duplázza a támadási sebességedet és a mozgási tempódat.</p>
+                    </div>
+                    <div class="shop-footer">
+                        <span class="price-tag">350 CC</span>
+                        <button onclick="buyProduct('Karmos Fúria', 350)">Megvétel</button>
+                    </div>
                 </div>
-                <div class="shop-item">
-                    <h3>Cyber Skin</h3>
-                    <p>Exkluzív futurisztikus külső a karakterednek.</p>
-                    <div class="price">1200 CatCoin</div>
-                    <button onclick="buyItem('Cyber Skin')">Vásárlás</button>
+                <div class="shop-card">
+                    <div>
+                        <span class="tag">Ability // Védelem</span>
+                        <h3>Pajzs Fal (Guardian)</h3>
+                        <p>Elnyeli a beérkező sebzések 80%-át egy rövid ideig tartó energiamezővel.</p>
+                    </div>
+                    <div class="shop-footer">
+                        <span class="price-tag">500 CC</span>
+                        <button onclick="buyProduct('Pajzs Fal', 500)">Megvétel</button>
+                    </div>
                 </div>
-                <div class="shop-item">
-                    <h3>Dupla XP Bónusz</h3>
-                    <p>24 órás gyorsított szintlépés.</p>
-                    <div class="price">800 CatCoin</div>
-                    <button onclick="buyItem('Dupla XP Bónusz')">Vásárlás</button>
+                <div class="shop-card">
+                    <div>
+                        <span class="tag">Ability // Támadás</span>
+                        <h3>Lézersugár (Sniper)</h3>
+                        <p>Nagy hatótávolságú, fix célpontra leadott kritikus lövés, ami áttöri a páncélt.</p>
+                    </div>
+                    <div class="shop-footer">
+                        <span class="price-tag">750 CC</span>
+                        <button onclick="buyProduct('Lézersugár', 750)">Megvétel</button>
+                    </div>
+                </div>
+                <div class="shop-card">
+                    <div>
+                        <span class="tag">Felszerelés // Bónusz</span>
+                        <h3>Arany Hal Csomag</h3>
+                        <p>Gyorsítónövelő bónuszcsomag a hatékonyabb fejlődéshez.</p>
+                    </div>
+                    <div class="shop-footer">
+                        <span class="price-tag">200 CC</span>
+                        <button onclick="buyProduct('Arany Hal Csomag', 200)">Megvétel</button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -396,103 +513,168 @@
 
     <!-- BEJELENTKEZŐ / REGISZTRÁCIÓS MODAL -->
     <div id="auth-modal" class="modal">
-        <div class="modal-content">
-            <h3 id="modal-title">Fiók Bejelentkezés</h3>
-            <div class="form-group">
+        <div class="modal-box">
+            <h3>Játékos Bejelentkezés</h3>
+            <div class="input-group">
                 <label>Felhasználónév</label>
-                <input type="text" id="auth-username" placeholder="pl. jatekos01">
-            </div>
-            <div class="form-group">
-                <label>Jelszó</label>
-                <input type="password" id="auth-password" placeholder="********">
+                <input type="text" id="username-input" placeholder="pl. catbi_master">
             </div>
             <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                <button onclick="handleAuth()" style="flex:1;">Belépés / Regisztráció</button>
-                <button onclick="closeModal('auth-modal')" class="btn-secondary">Mégse</button>
+                <button onclick="handleLogin()" style="flex:1;">Folytatás</button>
+                <button onclick="closeAuthModal()" class="btn-outline">Mégse</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Lenyitható kártyák kezelése
-        function toggleCard(card) {
-            card.classList.toggle('active');
+        // Lenyitható kártyák logikája
+        function toggleEntity(card) {
+            card.classList.toggle('open');
         }
 
-        // Modal ablakok kezelése
-        function openModal(id) {
-            document.getElementById(id).style.display = 'flex';
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).style.display = 'none';
-        }
-
-        // Fiókrendszer és Auto-Save logika (localStorage alapú)
+        // Adatbázis szimuláció localStorage-al (Auto-save)
         let currentUser = localStorage.getItem('catbi_current_user');
+
+        function getPlayers() {
+            return JSON.parse(localStorage.getItem('catbi_players') || '[]');
+        }
+
+        function savePlayers(players) {
+            localStorage.setItem('catbi_players', JSON.stringify(players));
+        }
 
         function initApp() {
             if (currentUser) {
-                document.getElementById('user-display').style.display = 'inline-block';
-                document.getElementById('username-span').innerText = currentUser;
-                document.getElementById('login-btn').style.display = 'none';
-                document.getElementById('logout-btn').style.display = 'inline-block';
-
-                // Ha az owner vagy, mutassuk az admin panelt
-                if (currentUser.toLowerCase() === 'owner') {
-                    document.getElementById('admin-panel').style.display = 'block';
-                    loadAdminPlayers();
+                let players = getPlayers();
+                let player = players.find(p => p.name === currentUser);
+                
+                // Ha még nincs regisztrálva de benne van
+                if (!player) {
+                    player = { name: currentUser, date: new Date().toLocaleDateString('hu-HU'), coins: 1000 };
+                    players.push(player);
+                    savePlayers(players);
                 }
+
+                document.getElementById('login-trigger-btn').style.display = 'none';
+                document.getElementById('user-info').style.display = 'flex';
+                document.getElementById('balance-badge').style.display = 'inline-block';
+                document.getElementById('username-display').innerText = player.name;
+                document.getElementById('user-coins').innerText = player.coins;
+
+                // Owner ellenőrzés
+                if (player.name.toLowerCase() === 'owner') {
+                    document.getElementById('admin-panel').style.display = 'block';
+                    renderAdminTable();
+                }
+            } else {
+                document.getElementById('login-trigger-btn').style.display = 'inline-block';
+                document.getElementById('user-info').style.display = 'none';
+                document.getElementById('balance-badge').style.display = 'none';
+                document.getElementById('admin-panel').style.display = 'none';
             }
         }
 
-        function handleAuth() {
-            const username = document.getElementById('auth-username').value.trim();
-            if (!username) {
+        function openAuthModal() {
+            document.getElementById('auth-modal').style.display = 'flex';
+        }
+
+        function closeAuthModal() {
+            document.getElementById('auth-modal').style.display = 'none';
+        }
+
+        function handleLogin() {
+            let name = document.getElementById('username-input').value.trim();
+            if (!name) {
                 alert('Add meg a felhasználóneved!');
                 return;
             }
 
-            // Felhasználók mentése a localStorage-ba (Auto-save adatbázis szimuláció)
-            let players = JSON.parse(localStorage.getItem('catbi_players') || '[]');
-            let existing = players.find(p => p.username === username);
+            let players = getPlayers();
+            let player = players.find(p => p.name === name);
 
-            if (!existing) {
-                players.push({ username: username, date: new Date().toLocaleDateString('hu-HU') });
-                localStorage.setItem('catbi_players', JSON.stringify(players));
+            if (!player) {
+                // Új játékos alap 1000 coin-nal
+                player = { name: name, date: new Date().toLocaleDateString('hu-HU'), coins: 1000 };
+                players.push(player);
+                savePlayers(players);
             }
 
-            localStorage.setItem('catbi_current_user', username);
-            currentUser = username;
-            closeModal('auth-modal');
+            localStorage.setItem('catbi_current_user', name);
+            currentUser = name;
+            closeAuthModal();
             initApp();
-            alert('Sikeres bejelentkezés! A rendszer automatikusan menti a munkádat.');
         }
 
         function logout() {
             localStorage.removeItem('catbi_current_user');
+            currentUser = null;
             location.reload();
         }
 
-        function loadAdminPlayers() {
-            let players = JSON.parse(localStorage.getItem('catbi_players') || '[]');
-            let tbody = document.getElementById('player-table-body');
+        // Vásárlás logika
+        function buyProduct(name, price) {
+            if (!currentUser) {
+                alert('Kérlek jelentkezz be a vásárláshoz!');
+                openAuthModal();
+                return;
+            }
+
+            let players = getPlayers();
+            let player = players.find(p => p.name === currentUser);
+
+            if (player.coins < price) {
+                alert('Nincs elég CatCoinod ehhez a vásárláshoz!');
+                return;
+            }
+
+            player.coins -= price;
+            savePlayers(players);
+            initApp();
+            alert(`Sikeres megvétel: ${name}!`);
+        }
+
+        // Admin panel: Játékosok és pénz kezelése
+        function renderAdminTable() {
+            let tbody = document.getElementById('admin-players-tbody');
+            let players = getPlayers();
             tbody.innerHTML = '';
-            players.forEach(p => {
-                tbody.innerHTML += `<tr><td>${p.username}</td><td>${p.date}</td><td>Aktív</td></tr>`;
+
+            players.forEach((p, index) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${p.name}</strong></td>
+                        <td>${p.date}</td>
+                        <td>
+                            <input type="number" class="money-input" id="coin-input-${index}" value="${p.coins}"> CC
+                        </td>
+                        <td>
+                            <button onclick="updatePlayerCoins('${p.name}', ${index})" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">Mentés</button>
+                        </td>
+                    </tr>
+                `;
             });
         }
 
-        function buyItem(itemName) {
-            if (!currentUser) {
-                alert('Kérlek jelentkezz be a vásárláshoz!');
-                openModal('auth-modal');
+        function updatePlayerCoins(playerName, index) {
+            let newAmount = parseInt(document.getElementById(`coin-input-${index}`).value);
+            if (isNaN(newAmount)) {
+                alert('Érvénytelen összeg!');
                 return;
             }
-            alert(`Sikeres vásárlás: ${itemName}! Köszönjük, ${currentUser}.`);
+
+            let players = getPlayers();
+            let player = players.find(p => p.name === playerName);
+            if (player) {
+                player.coins = newAmount;
+                savePlayers(players);
+                renderAdminTable();
+                if (currentUser === playerName) {
+                    initApp();
+                }
+                alert(`Sikeresen frissítve ${playerName} egyenlege! (Auto-saved)`);
+            }
         }
 
-        // Oldal betöltésekor indítás
         window.onload = initApp;
     </script>
 </body>
